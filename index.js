@@ -2,75 +2,41 @@
 // ? Each movie has a genre: action, horror, drama, sci-fi, comedy etc.
 // - 1) Need endpoint for getting the list of genres, which will be in a drop down menu on client http://metflix.com/api/genres
 // #2) Can create a new genre, read a genre, update an existing one, and delete one
+// * -------------------------------------------------------------------------------------------
+// Mongoose connects here since this is where the app starts.
+const mongoose = require('mongoose');
 
+mongoose.connect('mongodb://localhost/vidly')
+  .then(console.log('Connected to MongoDB...'))
+  .catch((err) => console.error('Could not connect to MongoDb...', err));
+
+//! /* Start up code for application */
 const express = require('express');
-const Joi = require('joi');
+const homeRouter = require('./routes/home');
+const genresRouter = require('./routes/genres');
+const customersRouter = require('./routes/customers');
 
 const app = express();
-app.use(express.json());
 
-const genres = [
-  { type: 'action' },
-  { type: 'drama' },
-  { type: 'sci-fi' },
-  { type: 'horror' },
-];
+// set view engine for application. View engines allow us to render web pages using template files.
+app.set('view engine', 'pug'); // express internally loads 'pug' module
+app.set('views', './views');// templates are in this folder by default without needing to set here.
 
-function validate(genre) {
-  const schema = Joi.object({
-    type: Joi.string().min(3).required(),
-  });
-  return schema.validate(genre);
-}
+//! /* Middleware */
+app.use(express.json());// returns middleware fn - reads req and if json parses it  req.body into json obj.
 
 /* Homepage */
-app.get('/', (req, res) => {
-  res.send('<h1 style= "color: blue;">This is the homepage!</h1>');
-});
+// ~ For any route that starts with '/' use homeRouter
+app.use('/', homeRouter);
 
-/* Endpoint to get genres */
-app.get('/api/genres', (req, res) => {
-  res.send(genres);
-});
+// ~ For any route that starts with '/api/genres' use genresRouter
+app.use('/api/genres', genresRouter);
 
-/* Endpoint to get a single genre */
-app.get('/api/genres/:type', (req, res) => {
-  const genre = genres.find((g) => g.type === req.params.type);
-  if (!genre) return res.status(404).send('404 Error - Genre not found!');
-
-  res.send(genre);
-});
-
-/* Add a genre */
-app.post('/api/genres', (req, res) => {
-  const { error } = validate(req.body);// result = { error, value}
-  if (error) return res.status(400).send(error.details[0].message);
-
-  genres.push(req.body);
-  res.send(req.body);
-});
-
-/* Update a genre */
-app.put('/api/genres/:type', (req, res) => {
-  const genre = genres.find((g) => g.type === req.params.type);
-  if (!genre) return res.status(404).send('404 Error - Resource not found');
-
-  const { error } = validate(req.body);// result = { error, value}
-  if (error) return res.status(400).send(error.details[0].message);
-
-  genre.type = req.body.type;
-  res.send(genre);
-});
-
-/* Delete a genre */
-app.delete('/api/genres/:type', (req, res) => {
-  const genre = genres.find((g) => g.type === req.params.type);
-  if (!genre) return res.status(404).send('404 error - resource not found!');
-
-  const genreIndex = genres.indexOf(genre);
-  genres.splice(genreIndex, 1);
-  res.send(genre);
-});
+// ~ For any route that starts with '/customers' use customersRouter
+app.use('/api/customers', customersRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on ${port}...`));
+
+// eslint-disable-next-line max-len
+// ? Note: Middleware functions are functions that have access to the request object ( req ), the response object ( res ), and the next function in the application's request-response cycle. The next function is a function in the Express router which, when invoked, executes the middleware succeeding the current middleware.
