@@ -1,25 +1,27 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
-const Customer = mongoose.model('Customer', new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    minLength: 3,
-    maxLength: 50,
-  },
-  phone: {
-    type: String,
-    required: true,
-    minLength: 7,
-    maxLength: 11,
-
-  },
-  isGold: {
-    type: Boolean,
-    default: false,
-  },
-}));
+const Customer = mongoose.model(
+  'Customer',
+  new mongoose.Schema({
+    name: {
+      type: String,
+      required: true,
+      minLength: 3,
+      maxLength: 50,
+    },
+    phone: {
+      type: String,
+      required: true,
+      minLength: 7,
+      maxLength: 11,
+    },
+    isGold: {
+      type: Boolean,
+      default: false,
+    },
+  })
+);
 
 // Validation to check that client sent data in correct form
 function validateCustomer(customer) {

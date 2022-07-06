@@ -1,5 +1,6 @@
 // ~ routes for /api/customers
 const express = require('express');
+const auth = require('../middleware/auth');
 const { Customer, validateCustomer } = require('../models/Customer'); // Customer model(Like a class)
 
 const router = express.Router();
@@ -22,7 +23,7 @@ router.get('/:id', async (req, res) => { // /api/customers/:id
 });
 
 /* Add a customer */
-router.post('/', async (req, res) => { // /api/customers/
+router.post('/', auth, async (req, res) => { // /api/customers/
   const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.message);
   console.log('Did this part run?');
@@ -43,7 +44,7 @@ router.post('/', async (req, res) => { // /api/customers/
 
 /* TODO - Still need to add validation with Joi to most functions */
 /* Update a customer */
-router.put('/:id', async (req, res) => { // /api/customers/:id
+router.put('/:id', auth, async (req, res) => { // /api/customers/:id
   const customer = await Customer.findByIdAndUpdate(
     req.params.id,
     {
@@ -59,7 +60,7 @@ router.put('/:id', async (req, res) => { // /api/customers/:id
 });
 
 /* Delete a customer */
-router.delete('/:id', async (req, res) => { // /api/customers/:id
+router.delete('/:id', auth, async (req, res) => { // /api/customers/:id
   try {
     const customer = await Customer.findByIdAndRemove(req.params.id);
     if (!customer) return res.status(404).send('Error');
