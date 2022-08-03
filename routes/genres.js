@@ -1,9 +1,11 @@
 // ~ routes for /api/genres
 const express = require('express');
 // const asyncMiddleWare = require('../middleware/async'); // Using npm 'express-async-errors' instead
+const { default: mongoose } = require('mongoose');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const { Genre, validateGenre } = require('../models/Genre');
+const validateObjectId = require('../middleware/validateObjectId');
 
 const router = express.Router();
 
@@ -14,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 /* Endpoint to get a single genre */
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjectId, async (req, res) => {
   // /api/genres:id
   const genre = await Genre.findById(req.params.id);
   if (!genre) return res.status(404).send('404 Error - Genre not found!');

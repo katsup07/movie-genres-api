@@ -19,7 +19,9 @@ require('./startup/logging')();
 require('./startup/routes')(app);
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => winston.info(`Listening on Port ${port}...`));
+const server = app.listen(port, () => winston.info(`Listening on Port ${port}...`));
+
+module.exports = server;
 
 // eslint-disable-next-line max-len
 // ? Note: Middleware functions are functions that have access to the request object ( req ), the response object ( res ), and the 'next' function in the application's request-response cycle. The 'next' function is a function in the Express router which, when invoked, executes the middleware succeeding the current middleware.

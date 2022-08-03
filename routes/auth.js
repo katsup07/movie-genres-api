@@ -16,9 +16,7 @@ router.post('/', async (req, res) => {
   if (error) return res.status(404).send(error.details[0].message);
 
   // use findOne when looking up by properties
-  const user = await User.findOne({ email: req.body.email }).catch((err) =>
-    res.send(err)
-  );
+  const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(400).send('Invalid email or password');
   // compares plain-text password with hashed-password // compare() will get salt and hash the plain-text password.
   // If equal, will return true.

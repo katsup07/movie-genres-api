@@ -1,5 +1,5 @@
 const winston = require('winston'); // default logger comes with transport for loggin messages in the console. Can also create custom
-require('winston-mongodb');
+// require('winston-mongodb'); // ! commented out temporarily for integration testing
 require('express-async-errors');
 
 module.exports = function () {
@@ -10,11 +10,11 @@ module.exports = function () {
   );
 
   winston.add(winston.transports.File, { filename: 'logfile.log' }); // Another transport that is for logging messages in a file locally in the parent folder.
-  winston.add(winston.transports.MongoDB, {
-    db: 'mongodb://localhost/vidly',
-    level: 'error',
-  }); // Another transport for logging in mongoDB. db: 'database connection string'
-};
+  // winston.add(winston.transports.MongoDB, {
+  //   db: 'mongodb://localhost/vidly',
+  //   level: 'error',
+  // }); // Another transport for logging in mongoDB. db: 'database connection string'
+}; // ! commented out the above temporarily for integration testing
 
 // Catches unhandled promise rejections
 /* process.on('unhandledRejection', (ex) => {
