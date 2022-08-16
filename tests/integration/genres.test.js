@@ -13,7 +13,7 @@ describe('/api/genres', () => {
     server = require('../../index');
   });
   afterEach(async () => {
-    server.close();
+    await server.close();
     await Genre.deleteMany({}); // Every time modify code, will add two genresand they will accumulate and make the test fail, so need to remove at end. Whenever modifying the state, should always clean up after.
   });
 
@@ -24,7 +24,6 @@ describe('/api/genres', () => {
       const res = await request(server).get('/api/genres');
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
-      console.log(res.body);
       expect(res.body.some((g) => g.name === 'genre1')).toBeTruthy();
       expect(res.body.some((g) => g.name === 'genre2')).toBeTruthy();
     });
@@ -41,7 +40,6 @@ describe('/api/genres', () => {
       // const res = await request(server).get(`/api/genres/${insertedId.toJSON()}`);
       const res = await request(server).get(`/api/genres/${genre._id}`);
       expect(res.status).toBe(200);
-      console.log(genre, res.body);
       expect(res.body).toHaveProperty('name', genre.name);
       // expect(res.body.name).toBe('genre1');
     });
@@ -112,6 +110,66 @@ describe('/api/genres', () => {
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('_id');
       expect(res.body).toHaveProperty('name', 'genre1');
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    let token;
+    let genre;
+    let id;
+    beforeEach(async () => {
+      genre = new Genre({ name: 'genre1' });
+      await genre.save();
+
+      token = new User({ isAdmin: true }).generateAuthToken();
+    });
+
+    afterEach(async () => {
+      await Genre.deleteMany({});
+    });
+
+    it('should return a 401 error if client is not logged in', async () => {
+      const res = await request(server).delete('/api/genres/1');
+      expect(res.status).toBe(401);
+    });
+
+    it('should return a 403 error if user is not admin', async () => {
+      token = new User().generateAuthToken();
+      const res = await request(server)
+        .delete('/api/genres/1')
+        .set('x-auth-token', token);
+
+      expect(res.status).toBe(403);
+    });
+    it('should return a 404 if user is admin, but no such id and id is of the wrong form for mongoDB', async () => {
+      const id = 1;
+
+      const res = await request(server)
+        .delete(`/api/genres/${id}`)
+        .set('x-auth-token', token)
+        .send();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return a 404 if user is admin and id is of valid form, but no such id in mongoDB ', async () => {
+      id = genre._id;
+      const res = await request(server)
+        .delete(`/api/genres/${'62b06a12a97d5f44b131a803'}`)
+        .set('x-auth-token', token)
+        .send();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return a 200 if user is admin and id is valid', async () => {
+      id = genre._id;
+      const res = await request(server)
+        .delete(`/api/genres/${id}`)
+        .set('x-auth-token', token)
+        .send();
+
+      expect(res.status).toBe(200);
     });
   });
 });

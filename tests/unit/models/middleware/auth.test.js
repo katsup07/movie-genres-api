@@ -12,9 +12,6 @@ describe('auth middleware', () => {
     const res = {};
     const next = jest.fn();
     auth(req, res, next);
-    console.log('!!!!!!!!!!!!!!!!!!!!!!');
-    console.log('user: ', user);
-    console.log('req.user: ', req.user);
     expect(req.user).toHaveProperty('isAdmin');
     expect(req.user).toHaveProperty('_id');
   });

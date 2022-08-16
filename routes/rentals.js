@@ -23,11 +23,15 @@ router.post('/', async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Check for valid customer id provided by client
-  const customer = await Customer.findById(req.body.customerId).catch((err) => res.send(err));
+  const customer = await Customer.findById(req.body.customerId).catch((err) =>
+    res.send(err)
+  );
   if (!customer) return res.status(400).send('Invalid customer.');
 
   // Check for valid movie id provided by client
-  const movie = await Movie.findById(req.body.movieId).catch((err) =>res.send(err));
+  const movie = await Movie.findById(req.body.movieId).catch((err) =>
+    res.send(err)
+  );
   if (!movie) return res.status(400).send('Invalid movie.');
 
   if (movie.numberInStock === 0)

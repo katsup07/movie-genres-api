@@ -54,7 +54,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 /* Delete a genre */
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
   // auth() is a mw function that is exectuted before the next mw, which is admin(), and then the next mw, which is a route handler --> function(req, res)
   // '/api/genres:id'
   const genre = await Genre.findByIdAndRemove(req.params.id);
