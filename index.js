@@ -6,8 +6,10 @@
 // Mongoose connects here since this is where the app starts.
 const express = require('express');
 const winston = require('winston');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 // no need to install in const
 require('./startup/initializeDB')();
 require('./startup/validation')();
@@ -19,7 +21,7 @@ require('./startup/logging')();
 require('./startup/routes')(app);
 require('./startup/prod')(app);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3090;
 const server = app.listen(port, () =>
   winston.info(`Listening on Port ${port}...`)
 );

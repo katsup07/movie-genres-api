@@ -43,6 +43,8 @@ router.post('/', async (req, res) => {
 
   res // set header and send response to client
     .header('x-auth-token', token) // res.header( 'nameOfHeader', value ) //  prefix custom headers with 'x-'
+    // need to set this header below so client can read the custom header above. It will 'expose' the header above.
+    .header('access-control-expose-headers', 'x-auth-token')
     .send(_.pick(newUser, ['_id', 'name', 'email'])); // give object, 'newUser', and array of properties to pick.
 }); // See notes below for alternate way to do this part
 

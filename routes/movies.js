@@ -1,6 +1,7 @@
 // ~ routes for /api/movies
 const express = require('express');
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const { Movie, validateMovie } = require('../models/Movie');
 const { Genre } = require('../models/Genre');
 
@@ -29,8 +30,8 @@ router.get('/:id', async (req, res) => {
 /* Add a new movie */
 router.post('/', auth, async (req, res) => {
   const { error } = validateMovie(req.body);
+  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
-
   const genre = await Genre.findById(req.body.genreId).catch((err) =>
     res.send(err)
   );
@@ -74,12 +75,12 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 /* Remove */
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
   // eslint-disable-next-line prettier/prettier
   const movie = Movie.findByIdAndRemove(req.params.id)
                      .catch((err) => console.log(err));
 
-  if (!movie) res.status(404).send('404 Error - resource not found');
+  if (!movie) return res.status(404).send('404 Error - resource not found');
   res.send(movie);
 });
 
